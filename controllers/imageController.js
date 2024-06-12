@@ -4,28 +4,29 @@ const fs = require("fs");
 
 const uploadImage = async (req, res) => {
   try {
-    const filePath = path.join(
-      __dirname,
-      "../../images/original/",
-      req.file.filename
-    );
-    const optimizedPath = path.join(
-      __dirname,
-      "../../images/optimized/",
-      req.file.filename
-    );
+    const { image } = req.body;
+    const originalname = image.originalname;
 
-    await sharp(filePath).resize(800).toFile(optimizedPath);
+    //yeha samw image data aaudaix, aba image lai properly handle grnu x, there may be problem below here..
+    const buffer = Buffer.from(image, 'base64'); // Error occurs here
+    console.log(buffer);
+    const filename = `${Date.now()}-${originalname}`;
+    const originalPath = path.join(__dirname, "../../images/original/", filename);
+    const optimizedPath = path.join(__dirname, "../../images/optimized/", filename);
 
-    fs.unlinkSync(filePath);
+    await fs.promises.writeFile(originalPath, buffer);
+    await sharp(originalPath).resize(800).toFile(optimizedPath);
 
-    const imageUrl = `/images/optimized/${req.file.filename}`;
+    fs.unlinkSync(originalPath); // Delete original image after optimization
+
+    const imageUrl = `/images/optimized/${filename}`;
     res.status(200).json({ imageUrl });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ error: "Error processing image" });
   }
 };
+
 
 const getImage = (req, res) => {
   const filePath = path.join(
