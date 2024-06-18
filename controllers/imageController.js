@@ -6,11 +6,12 @@ require("dotenv").config();
 const uploadImage = async (req, res) => {
   try {
     const { image } = req.body;
+    console.log(image);
     const originalname = image.originalname;
 
     // Use the buffer property directly
     const buffer = image.buffer;
-    // console.log(buffer);
+    console.log(buffer);
     const filename = `${Date.now()}-${originalname}`;
     const originalPath = path.join(
       __dirname,
