@@ -6,13 +6,35 @@ require("dotenv").config();
 const uploadImage = async (req, res) => {
   try {
     const { image } = req.body;
-    console.log(image);
-    const originalname = image.originalname;
+    const { size } = req.params;
 
-    // Use the buffer property directly
-    const buffer = image.buffer;
-    console.log(buffer);
-    const filename = `${Date.now()}-${originalname}`;
+    // console.log(image);
+    let buffer;
+    let filename;
+
+    if (image.buffer && image.originalname) {
+      console.log("image buffer ");
+      // Image buffer case
+      const originalname = image.originalname;
+      buffer = image.buffer;
+      filename = `${Date.now()}-${originalname}`;
+      console.log(filename, buffer);
+    } else if (image.startsWith("data:image")) {
+      console.log("base 64 image ");
+      // Base64 image case
+      const matches = image.match(/^data:image\/([a-zA-Z]+);base64,([^\s]+)$/);
+      if (!matches) {
+        return res.status(400).json({ error: "Invalid image data" });
+      }
+      const ext = matches[1];
+      const data = matches[2];
+      buffer = Buffer.from(data, "base64");
+      filename = `${Date.now()}.${ext}`;
+      console.log(filename, buffer);
+    } else {
+      return res.status(400).json({ error: "Invalid image data" });
+    }
+
     const originalPath = path.join(
       __dirname,
       "../../images/original/",
@@ -24,16 +46,18 @@ const uploadImage = async (req, res) => {
       filename
     );
 
-    await fs.promises.writeFile(originalPath, Buffer.from(buffer));
+    // await fs.promises.writeFile(originalPath, Buffer.from(buffer));
 
-    await sharp(originalPath).resize(800).toFile(optimizedPath);
+    await sharp(Buffer.from(buffer))
+      .resize(parseInt(size))
+      .toFile(optimizedPath);
 
-    // fs.unlinkSync(originalPath); // problem here, permission related
+    // await fs.promises.unlink(originalPath);
 
     const imageUrl = `http://localhost:${process.env.PORT}/${filename}`;
     res.status(200).json({ imageUrl });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Error processing image" });
   }
 };
