@@ -35,14 +35,10 @@ const uploadImage = async (req, res) => {
       return res.status(400).json({ error: "Invalid image data" });
     }
 
-    const originalPath = path.join(
-      __dirname,
-      "../../images/original/",
-      filename
-    );
+    const originalPath = path.join(__dirname, "../public/original/", filename);
     const optimizedPath = path.join(
       __dirname,
-      "../../images/optimized/",
+      "../public/optimized/",
       filename
     );
 
@@ -65,7 +61,7 @@ const uploadImage = async (req, res) => {
 const getImage = (req, res) => {
   const filePath = path.join(
     __dirname,
-    "../../images/optimized/",
+    "../public/optimized/",
     req.params.filename
   );
   // console.log(filePath);
@@ -79,7 +75,7 @@ const getImage = (req, res) => {
 const deleteImage = (req, res) => {
   const filePath = path.join(
     __dirname,
-    "../../images/optimized/",
+    "../public/optimized/",
     req.params.filename
   );
   try {
