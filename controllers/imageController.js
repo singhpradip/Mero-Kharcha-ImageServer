@@ -13,15 +13,15 @@ const uploadImage = async (req, res) => {
     let filename;
 
     if (image.buffer && image.originalname) {
-      console.log("image buffer ");
       // Image buffer case
+      console.log("image buffer ");
       const originalname = image.originalname;
       buffer = image.buffer;
       filename = `${Date.now()}-${originalname}`;
       console.log(filename, buffer);
     } else if (image.startsWith("data:image")) {
-      console.log("base 64 image ");
       // Base64 image case
+      console.log("base 64 image ");
       const matches = image.match(/^data:image\/([a-zA-Z]+);base64,([^\s]+)$/);
       if (!matches) {
         return res.status(400).json({ error: "Invalid image data" });
@@ -35,12 +35,8 @@ const uploadImage = async (req, res) => {
       return res.status(400).json({ error: "Invalid image data" });
     }
 
-    const originalPath = path.join(__dirname, "../public/original/", filename);
-    const optimizedPath = path.join(
-      __dirname,
-      "../public/optimized/",
-      filename
-    );
+    const originalPath = path.join(__dirname, "../public/original", filename);
+    const optimizedPath = path.join(__dirname, "../public/optimized", filename);
 
     // await fs.promises.writeFile(originalPath, Buffer.from(buffer));
 
@@ -61,7 +57,7 @@ const uploadImage = async (req, res) => {
 const getImage = (req, res) => {
   const filePath = path.join(
     __dirname,
-    "../public/optimized/",
+    "../public/optimized",
     req.params.filename
   );
   // console.log(filePath);
@@ -75,7 +71,7 @@ const getImage = (req, res) => {
 const deleteImage = (req, res) => {
   const filePath = path.join(
     __dirname,
-    "../public/optimized/",
+    "../public/optimized",
     req.params.filename
   );
   try {
